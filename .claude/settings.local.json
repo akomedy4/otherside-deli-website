@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//opt/homebrew/**)",
+      "Read(//usr/local/bin/**)",
+      "Read(//Applications/**)",
+      "Bash(mdls -name kMDItemDurationSeconds -name kMDItemPixelHeight -name kMDItemPixelWidth \"/Users/rahulvig/Movies/DaVinci Resolve/otherside-deli/images/sandwich-bg.mp4\")",
+      "Bash(brew list *)",
+      "Bash(python3 -c \"import cv2; print\\(cv2.__version__\\)\")",
+      "Bash(python3 -c \"import PIL; print\\(PIL.__version__\\)\")",
+      "Bash(node -e \"const fs = require\\('fs'\\); const { execSync } = require\\('child_process'\\); console.log\\(execSync\\('ls /usr/bin/ | grep -E \\\\\"avconv|ffmpeg|python\\\\\"'\\).toString\\(\\)\\)\")",
+      "Bash(python3 -c \"import subprocess; r=subprocess.run\\(['osascript','-e','tell app \\\\\"QuickTime Player\\\\\" to version'],capture_output=True\\); print\\(r.stdout\\)\")",
+      "Bash(avconvert --help)",
+      "Bash(swift -)",
+      "Bash(python3 -c \"import objc; print\\('PyObjC available'\\)\")",
+      "Bash(python3 -c \"import cv2; print\\('OpenCV available'\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -c \"import cv2; print\\('OpenCV', cv2.__version__\\)\")",
+      "Bash(python3)",
+      "Bash(open -R /Users/aaronkim/Downloads/otherside-deli.zip)"
+    ]
+  }
+}
