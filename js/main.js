@@ -421,7 +421,7 @@ function initScrollHero() {
 
   const ctx         = canvas.getContext('2d');
   const FRAME_COUNT = 61;
-  const FRAME_START = 15; // first frame shown at rest (frames 0-14 still loaded)
+  const FRAME_START = 0;
   const EAGER_COUNT = 6;  // load first 6 immediately, rest after page load
 
   function frameSrc(i) {
@@ -476,7 +476,7 @@ function initScrollHero() {
   function updateFrame() {
     rafId = null;
     const hero      = document.querySelector('.hero');
-    const maxScroll = hero ? hero.offsetHeight / 3 : document.documentElement.scrollHeight - window.innerHeight;
+    const maxScroll = hero ? hero.offsetHeight / 5 : document.documentElement.scrollHeight - window.innerHeight;
     if (maxScroll <= 0) return;
 
     const progress   = Math.min(window.scrollY / maxScroll, 1);
