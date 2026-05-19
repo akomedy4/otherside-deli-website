@@ -432,7 +432,7 @@ function initScrollHero() {
 
   let currentImg = null;
 
-  // Draw with object-fit: cover — crops center, no squish
+  // Draw with object-fit: cover — on mobile shift crop upward to reveal more of the bottom
   function drawFrame(img) {
     if (!img.complete || !img.naturalWidth) return;
     currentImg = img;
@@ -440,7 +440,9 @@ function initScrollHero() {
     const iw = img.naturalWidth, ih = img.naturalHeight;
     const scale = Math.max(cw / iw, ch / ih);
     const sw = cw / scale, sh = ch / scale;
-    const sx = (iw - sw) / 2, sy = (ih - sh) / 2;
+    const sx = (iw - sw) / 2;
+    const yFocus = window.innerWidth < 768 ? 0.25 : 0.5;
+    const sy = (ih - sh) * yFocus;
     ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
   }
 
