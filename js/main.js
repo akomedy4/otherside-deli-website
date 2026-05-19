@@ -421,7 +421,8 @@ function initScrollHero() {
 
   const ctx         = canvas.getContext('2d');
   const FRAME_COUNT = 61;
-  const EAGER_COUNT = 6; // load first 6 immediately, rest after page load
+  const FRAME_START = 15; // first frame shown at rest (frames 0-14 still loaded)
+  const EAGER_COUNT = 6;  // load first 6 immediately, rest after page load
 
   function frameSrc(i) {
     return `images/sandwich-frames/frame-${String(i).padStart(4, '0')}.jpg`;
@@ -453,9 +454,9 @@ function initScrollHero() {
   requestAnimationFrame(resizeCanvas);
   window.addEventListener('resize', resizeCanvas, { passive: true });
 
-  // Load first frame eagerly so hero is painted before scroll
-  frames[0].onload = () => drawFrame(frames[0]);
-  frames[0].src = frameSrc(0);
+  // Load starting frame eagerly so hero is painted before scroll
+  frames[FRAME_START].onload = () => drawFrame(frames[FRAME_START]);
+  frames[FRAME_START].src = frameSrc(FRAME_START);
 
   // Load next few eagerly (likely scroll targets)
   for (let i = 1; i < EAGER_COUNT; i++) {
@@ -469,7 +470,7 @@ function initScrollHero() {
     }
   }, { once: true });
 
-  let lastFrame = 0;
+  let lastFrame = FRAME_START;
   let rafId     = null;
 
   function updateFrame() {
@@ -479,9 +480,9 @@ function initScrollHero() {
     if (maxScroll <= 0) return;
 
     const progress   = Math.min(window.scrollY / maxScroll, 1);
-    const frameIndex = Math.round(progress * (FRAME_COUNT - 1));
+    const frameIndex = FRAME_START + Math.round(progress * (FRAME_COUNT - 1 - FRAME_START));
 
-    if (frameIndex !== lastFrame || frameIndex === 0) {
+    if (frameIndex !== lastFrame) {
       drawFrame(frames[frameIndex]);
       lastFrame = frameIndex;
     }
