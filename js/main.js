@@ -416,42 +416,71 @@ function initOrderPage() {
 
 // ---- Scroll-Driven Frame Sequence -----------------------
 function initScrollHero() {
-  const imgEl = document.getElementById('sandwich-frame');
-  if (!imgEl) return;
+  const canvas = document.getElementById('sandwich-frame');
+  if (!canvas) return;
 
+  const ctx         = canvas.getContext('2d');
   const FRAME_COUNT = 61;
+  const EAGER_COUNT = 6; // load first 6 immediately, rest after page load
 
-  // Preload all frames up front so swaps are instant
-  const frames = Array.from({ length: FRAME_COUNT }, (_, i) => {
-    const img = new Image();
-    img.src = `images/sandwich-frames/frame-${String(i).padStart(4, '0')}.jpg`;
-    return img;
-  });
+  function frameSrc(i) {
+    return `images/sandwich-frames/frame-${String(i).padStart(4, '0')}.jpg`;
+  }
 
-  let lastFrame   = 0;
-  let lastScrollY = -1;
+  const frames = Array.from({ length: FRAME_COUNT }, () => new Image());
 
-  function tick() {
-    requestAnimationFrame(tick);
+  // Size canvas to its CSS display size
+  function resizeCanvas() {
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas, { passive: true });
 
-    const scrollY = window.scrollY;
-    if (scrollY === lastScrollY) return;
-    lastScrollY = scrollY;
+  // Draw a frame flicker-free via canvas
+  function drawFrame(img) {
+    if (!img.complete || !img.naturalWidth) return;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  }
 
-    const hero = document.querySelector('.hero');
+  // Load first frame eagerly so hero is painted before scroll
+  frames[0].onload = () => drawFrame(frames[0]);
+  frames[0].src = frameSrc(0);
+
+  // Load next few eagerly (likely scroll targets)
+  for (let i = 1; i < EAGER_COUNT; i++) {
+    frames[i].src = frameSrc(i);
+  }
+
+  // Defer remaining frames until after page load to avoid startup burst
+  window.addEventListener('load', () => {
+    for (let i = EAGER_COUNT; i < FRAME_COUNT; i++) {
+      frames[i].src = frameSrc(i);
+    }
+  }, { once: true });
+
+  let lastFrame = 0;
+  let rafId     = null;
+
+  function updateFrame() {
+    rafId = null;
+    const hero      = document.querySelector('.hero');
     const maxScroll = hero ? hero.offsetHeight / 3 : document.documentElement.scrollHeight - window.innerHeight;
     if (maxScroll <= 0) return;
 
-    const progress   = Math.min(scrollY / maxScroll, 1);
+    const progress   = Math.min(window.scrollY / maxScroll, 1);
     const frameIndex = Math.round(progress * (FRAME_COUNT - 1));
 
-    if (frameIndex !== lastFrame) {
-      imgEl.src  = frames[frameIndex].src;
-      lastFrame  = frameIndex;
+    if (frameIndex !== lastFrame || frameIndex === 0) {
+      drawFrame(frames[frameIndex]);
+      lastFrame = frameIndex;
     }
   }
 
-  requestAnimationFrame(tick);
+  // Only fire RAF on scroll — no idle spinning
+  window.addEventListener('scroll', () => {
+    if (!rafId) rafId = requestAnimationFrame(updateFrame);
+  }, { passive: true });
 }
 
 // ---- Scroll Reveals (IntersectionObserver) --------------
