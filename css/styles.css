@@ -387,7 +387,7 @@ h3 {
   align-items: center;
   gap: 0.75rem;
   margin-top: auto;
-  margin-bottom: 20px;
+  margin-bottom: clamp(1.6rem, 5.5vw, 3.2rem);
 }
 
 .hero-caption {
