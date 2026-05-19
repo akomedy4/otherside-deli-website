@@ -429,19 +429,29 @@ function initScrollHero() {
 
   const frames = Array.from({ length: FRAME_COUNT }, () => new Image());
 
-  // Size canvas to its CSS display size
-  function resizeCanvas() {
-    canvas.width  = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-  }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas, { passive: true });
+  let currentImg = null;
 
-  // Draw a frame flicker-free via canvas
+  // Draw with object-fit: cover — crops center, no squish
   function drawFrame(img) {
     if (!img.complete || !img.naturalWidth) return;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    currentImg = img;
+    const cw = canvas.width, ch = canvas.height;
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const scale = Math.max(cw / iw, ch / ih);
+    const sw = cw / scale, sh = ch / scale;
+    const sx = (iw - sw) / 2, sy = (ih - sh) / 2;
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
   }
+
+  // Size canvas to its CSS display size, then redraw so resize never clears
+  function resizeCanvas() {
+    canvas.width  = canvas.offsetWidth  || canvas.parentElement.offsetWidth;
+    canvas.height = canvas.offsetHeight || canvas.parentElement.offsetHeight;
+    if (currentImg) drawFrame(currentImg);
+  }
+  // Wait one frame so layout is complete before reading offsetWidth/Height
+  requestAnimationFrame(resizeCanvas);
+  window.addEventListener('resize', resizeCanvas, { passive: true });
 
   // Load first frame eagerly so hero is painted before scroll
   frames[0].onload = () => drawFrame(frames[0]);
