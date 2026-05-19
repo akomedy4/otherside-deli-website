@@ -368,6 +368,7 @@ h3 {
   font-size: clamp(2.75rem, 11vw, 6rem);
   position: relative;
   z-index: 1;
+  margin-top: clamp(1.4rem, 5.5vw, 3rem);
 }
 
 /* Soft gradient scrim behind the title — fades to transparent on all sides */
